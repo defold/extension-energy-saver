@@ -1,0 +1,4 @@
+images {
+  image: "/example/logo_64.png"
+}
+extrude_borders: 2

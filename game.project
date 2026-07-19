@@ -1,0 +1,19 @@
+[bootstrap]
+main_collection = /example/example.collectionc
+
+[input]
+game_binding = /input/game.input_bindingc
+
+[physics]
+gravity_y = -980.0
+scale = 0.01
+use_fixed_timestep = 1
+
+[render]
+clear_color_red = 0.2
+clear_color_green = 0.4
+clear_color_blue = 1.0
+
+[script]
+shared_state = 1
+

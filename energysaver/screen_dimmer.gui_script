@@ -1,0 +1,12 @@
+function init(self)
+	gui.set_render_order(15)
+	gui.set_enabled(gui.get_node("fullscreenbox"), false)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("enable_dimmer") then
+		gui.set_enabled(gui.get_node("fullscreenbox"), true)
+	elseif message_id == hash("disable_dimmer") then
+		gui.set_enabled(gui.get_node("fullscreenbox"), false)
+	end
+end
