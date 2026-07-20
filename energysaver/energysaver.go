@@ -1,5 +1,5 @@
 components {
-  id: "energysaver"
+  id: "config"
   component: "/energysaver/energysaver.script"
 }
 components {

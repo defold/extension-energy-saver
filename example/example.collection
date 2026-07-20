@@ -2,14 +2,6 @@ name: "example"
 instances {
   id: "energysaver"
   prototype: "/energysaver/energysaver.go"
-  component_properties {
-    id: "energysaver"
-    properties {
-      id: "max_fps"
-      value: "15.0"
-      type: PROPERTY_TYPE_NUMBER
-    }
-  }
 }
 scale_along_z: 0
 embedded_instances {

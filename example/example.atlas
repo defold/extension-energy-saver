@@ -1,4 +1,4 @@
 images {
-  image: "/example/logo_64.png"
+  image: "/example/assets/logo_64.png"
 }
 extrude_borders: 2

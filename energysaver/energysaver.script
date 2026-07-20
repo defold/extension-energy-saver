@@ -1,26 +1,28 @@
-go.property("energy_saving", 10)
-go.property("screen_dimming", 0)
-go.property("disable_rendering", 20)
+go.property("energy_saving", 30)
+go.property("screen_dimming", 60)
+go.property("disable_rendering", 120)
 go.property("max_fps", 30)
 go.property("is_energy_saving_allowed", true)
 
 
 local function create_timer(self, delay, enable_fn, disable_fn)
 	if delay == 0 then
-		return function() end
+		return { reset = function() end }
 	end
 	local handle = nil
-	return function()
-		if handle then
-			timer.cancel(handle)
-		else
-			disable_fn(self)
+	return {
+		reset = function()
+			if handle then
+				timer.cancel(handle)
+			else
+				disable_fn(self)
+			end
+			handle = timer.delay(delay, false, function()
+				enable_fn(self)
+				handle = nil
+			end)
 		end
-		handle = timer.delay(delay, false, function()
-			enable_fn(self)
-			handle = nil
-		end)
-	end
+	}
 end
 
 local function enable_energy_saver(self)
@@ -49,9 +51,9 @@ local function disable_screen_dimmer(self)
 end
 
 local function reset_timers(self)
-	self.energy_saver_timer()
-	self.disable_rendering_timer()
-	self.screen_dimming_timer()
+	self.energy_saver_timer.reset()
+	self.disable_rendering_timer.reset()
+	self.screen_dimming_timer.reset()
 end
 
 function init(self)
