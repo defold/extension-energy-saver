@@ -17,3 +17,6 @@ clear_color_blue = 1.0
 [script]
 shared_state = 1
 
+[library]
+include_dirs = energysaver
+
