@@ -14,9 +14,9 @@ clear_color_red = 0.2
 clear_color_green = 0.4
 clear_color_blue = 1.0
 
-[script]
-shared_state = 1
-
 [library]
 include_dirs = energysaver
+
+[project]
+title = Energy Saver
 
