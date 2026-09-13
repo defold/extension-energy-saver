@@ -1,6 +1,6 @@
 go.property("energy_saving", 30)
-go.property("screen_dimming", 60)
-go.property("disable_rendering", 120)
+go.property("screen_dimming", 30)
+go.property("disable_rendering", 60)
 go.property("max_fps", 30)
 go.property("is_energy_saving_allowed", true)
 
@@ -25,29 +25,43 @@ local function create_timer(self, delay, enable_fn, disable_fn)
 	}
 end
 
+local function notify_listener(self, message_id, message)
+	if self.listener then
+		msg.post(self.listener, message_id, message)
+	end
+end
+
 local function enable_energy_saver(self)
 	sys.set_update_frequency(self.max_fps)
 	print("energy saving enabled. update frequency set to", self.max_fps)
+	notify_listener(self, "energy_saver_enabled")
 end
 local function disable_energy_saver(self)
 	sys.set_update_frequency(self.default_update_frequency)
 	print("energy saving disabled. update frequency reset to", self.default_update_frequency)
+	notify_listener(self, "energy_saver_disabled")
 end
 
 local function disable_rendering(self)
 	sys.set_render_enabled(false)
 	print("rendering disabled")
+	notify_listener(self, "rendering_disabled")
 end
 local function enable_rendering(self)
 	sys.set_render_enabled(true)
 	print("rendering enabled")
+	notify_listener(self, "rendering_enabled")
+	
 end
 
 local function enable_screen_dimmer(self)
 	msg.post("#screen_dimmer", "enable_dimmer")
+	notify_listener(self, "screen_dimmer_enabled")
 end
 local function disable_screen_dimmer(self)
 	msg.post("#screen_dimmer", "disable_dimmer")
+	notify_listener(self, "screen_dimmer_disabled")
+	
 end
 
 local function reset_timers(self)
@@ -58,6 +72,7 @@ end
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
+	self.listener = nil
 	self.default_update_frequency = sys.get_config_int("display.update_frequency")
 	self.energy_saver_timer = create_timer(self, self.energy_saving, enable_energy_saver, disable_energy_saver)
 	self.disable_rendering_timer = create_timer(self, self.disable_rendering, disable_rendering, enable_rendering)
@@ -67,4 +82,12 @@ end
 
 function on_input(self, action_id, action)
 	reset_timers(self)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("subscribe") then
+		self.listener = sender
+	elseif message_id == hash("unsubscribe") then
+		self.listener = nil
+	end
 end

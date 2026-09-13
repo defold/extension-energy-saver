@@ -1,0 +1,50 @@
+local function update_status(self, dt)
+	local status = ""
+	status = status .. ("Dimmer: %s"):format(self.screen_dimmer_enabled and "ON" or "OFF")
+	status = status .. (" - Rendering: %s"):format(self.rendering_enabled and "ON" or "OFF")
+	status = status .. (" - Energy saver: %s"):format(self.energy_saver_enabled and "ON" or "OFF")
+	go.set("#status", "text", status)
+	self.timestamp = now
+end
+
+function init(self)
+	msg.post("/energysaver", "subscribe")
+	self.screen_dimmer_enabled = false
+	self.rendering_enabled = true
+	self.energy_saver_enabled = false
+	self.timestamp = socket.gettime()
+	self.initial_timestamp = socket.gettime()
+	self.accumulated_dt = 0
+	update_status(self)
+end
+
+function final(self)
+	msg.post("/energysaver", "unsubscribe")
+end
+
+function update(self, dt)
+	self.accumulated_dt = self.accumulated_dt + dt
+	update_status(self, dt)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("screen_dimmer_enabled") then
+		self.screen_dimmer_enabled = true
+		update_status(self)
+	elseif message_id == hash("screen_dimmer_disabled") then
+		self.screen_dimmer_enabled = false
+		update_status(self)
+	elseif message_id == hash("rendering_enabled") then
+		self.rendering_enabled = true
+		update_status(self)
+	elseif message_id == hash("rendering_disabled") then
+		self.rendering_enabled = false
+		update_status(self)
+	elseif message_id == hash("energy_saver_enabled") then
+		self.energy_saver_enabled = true
+		update_status(self)
+	elseif message_id == hash("energy_saver_disabled") then
+		self.energy_saver_enabled = false
+		update_status(self)
+	end
+end

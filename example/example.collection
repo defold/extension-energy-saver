@@ -547,3 +547,27 @@ embedded_instances {
     y: 366.24146
   }
 }
+embedded_instances {
+  id: "example"
+  data: "components {\n"
+  "  id: \"example\"\n"
+  "  component: \"/example/example.script\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"status\"\n"
+  "  type: \"label\"\n"
+  "  data: \"size {\\n"
+  "  x: 128.0\\n"
+  "  y: 32.0\\n"
+  "}\\n"
+  "text: \\\"Label\\\"\\n"
+  "font: \\\"/builtins/fonts/default.font\\\"\\n"
+  "material: \\\"/builtins/fonts/label-df.material\\\"\\n"
+  "\"\n"
+  "}\n"
+  ""
+  position {
+    x: 480.0
+    y: 40.0
+  }
+}
