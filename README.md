@@ -1,3 +1,5 @@
+![](https://img.shields.io/badge/defold-1.13.2-blue)
+
 # Energy Saver
 This extension can help reduce power consumption in your Defold game. This is especially useful on handheld devices where reduced power consumption will improve the player experience as the battery lasts longer. It also helps to avoid overheating and reduces both the player's energy bill and the game's carbon footprint.
 
