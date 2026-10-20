@@ -43,5 +43,24 @@ go.set("/energysaver#config", "is_energy_saving_allowed", false)
 go.set("/energysaver#config", "is_energy_saving_allowed", true)
 ```
 
+## CPU energy measurement
+
+`energysaver.get_cpu_energy_usage()` returns the current process's cumulative CPU energy usage since launch, in **joules**. The native Lua module is registered automatically; no `require()` is needed.
+
+Measurement is currently supported on macOS using `proc_pid_rusage()` with `RUSAGE_INFO_V6` and its `ri_energy_nj` counter. Availability depends on the macOS version, hardware and SDK used to build the extension. The reading covers process CPU energy only; it excludes GPU, display and other device energy use.
+
+The function returns `nil, error_message` on unsupported platforms, when the API fails, or when the counter is zero and support cannot be established. A zero counter may also be temporarily unavailable early in the process lifetime, so callers can retry later.
+
+```lua
+local joules, err = energysaver.get_cpu_energy_usage()
+if joules then
+	print("CPU energy since launch (J):", joules)
+else
+	print(err)
+end
+```
+
+To measure an interval, subtract an earlier successful reading from a later one. Divide that difference by elapsed seconds to obtain average CPU power in watts. Sample around once per second; the function reads the cumulative counter without resetting it.
+
 ## Sustainable Games Alliance
 The extension is created in collaboration with the [Sustainable Games Alliance](https://sustainablegamesalliance.org/). 
