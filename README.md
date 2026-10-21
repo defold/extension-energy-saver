@@ -62,5 +62,7 @@ end
 
 To measure an interval, subtract an earlier successful reading from a later one. Divide that difference by elapsed seconds to obtain average CPU power in watts. Sample around once per second; the function reads the cumulative counter without resetting it.
 
+Debug builds also expose the cumulative CPU energy usage in joules as the `CpuEnergyUsage` profiler counter. The extension updates it each frame when a reading is available, retaining the last successful value otherwise (initially zero). This automatic sampling and counter are excluded from release builds.
+
 ## Sustainable Games Alliance
 The extension is created in collaboration with the [Sustainable Games Alliance](https://sustainablegamesalliance.org/). 
