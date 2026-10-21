@@ -16,6 +16,18 @@ function init(self)
 	self.initial_timestamp = socket.gettime()
 	self.accumulated_dt = 0
 	update_status(self)
+
+	timer.delay(1, true, function()
+		local usage, err = energysaver.get_cpu_energy_usage()
+		if not usage or err then
+			go.set("#metrics", "text", err or "Unable to get energy usage")
+			return
+		end
+		local metrics = ""
+		metrics = metrics .. ("Acc: %f J"):format(usage.joules)
+		metrics = metrics .. (" Curr: %f W"):format(usage.watts or 0)
+		go.set("#metrics", "text", metrics)
+		end)
 end
 
 function final(self)

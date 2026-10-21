@@ -45,24 +45,34 @@ go.set("/energysaver#config", "is_energy_saving_allowed", true)
 
 ## CPU energy measurement
 
-`energysaver.get_cpu_energy_usage()` returns the current process's cumulative CPU energy usage since launch, in **joules**. The native Lua module is registered automatically; no `require()` is needed.
+`energysaver.get_cpu_energy_usage()` returns a table containing the current process's CPU energy and power:
+
+* `joules`: Cumulative CPU energy since launch, in **joules**.
+* `watts`: Average CPU power, in **watts** (joules per second). This is `nil` until two successful readings at least one second apart establish a sampling interval.
+
+The native Lua module is registered automatically; no `require()` is needed.
 
 Measurement is currently supported on macOS using `proc_pid_rusage()` with `RUSAGE_INFO_V6` and its `ri_energy_nj` counter. Availability depends on the macOS version, hardware and SDK used to build the extension. The reading covers process CPU energy only; it excludes GPU, display and other device energy use.
 
 The function returns `nil, error_message` on unsupported platforms, when the API fails, or when the counter is zero and support cannot be established. A zero counter may also be temporarily unavailable early in the process lifetime, so callers can retry later.
 
 ```lua
-local joules, err = energysaver.get_cpu_energy_usage()
-if joules then
-	print("CPU energy since launch (J):", joules)
+local usage, err = energysaver.get_cpu_energy_usage()
+if usage then
+	print("CPU energy since launch (J):", usage.joules)
+	if usage.watts ~= nil then
+		print("Average CPU power (W):", usage.watts)
+	end
 else
 	print(err)
 end
 ```
 
-To measure an interval, subtract an earlier successful reading from a later one. Divide that difference by elapsed seconds to obtain average CPU power in watts. Sample around once per second; the function reads the cumulative counter without resetting it.
+Power is calculated as the change in cumulative energy divided by monotonic elapsed seconds. It updates when at least one second has elapsed since the previous power sample, retaining the latest average between updates. This is an interval average, not instantaneous power or the average since launch. Reading does not reset the cumulative energy counter; a counter reset starts a new power interval, making `watts` temporarily `nil` again.
 
-Debug builds also expose the cumulative CPU energy usage in joules as the `CpuEnergyUsage` profiler counter. The extension updates it each frame when a reading is available, retaining the last successful value otherwise (initially zero). This automatic sampling and counter are excluded from release builds.
+Debug builds also expose `CpuEnergyUsage` (cumulative joules) and `CpuPowerUsage` (average watts) as profiler counters. The extension samples each frame and shares the power sampling interval with Lua calls. The counters retain their last successful values when a reading fails; both start at zero, and the power counter is zero while establishing an interval.
+
+Automatic sampling and profiler counters are excluded from release builds. In release builds, Lua calls drive sampling, so call regularly (around once per second) for recent power readings. Less frequent calls produce averages over longer intervals.
 
 ## Sustainable Games Alliance
 The extension is created in collaboration with the [Sustainable Games Alliance](https://sustainablegamesalliance.org/). 
